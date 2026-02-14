@@ -282,6 +282,273 @@
     drawAiroNetwork();
   }
 
+  // ─── RPG Canvas — Stat Bars & XP ─────────────────
+  const rpgCanvas = document.getElementById('rpg-canvas');
+  if (rpgCanvas) {
+    const rctx = rpgCanvas.getContext('2d');
+
+    function resizeRpgCanvas() {
+      const rect = rpgCanvas.parentElement.getBoundingClientRect();
+      rpgCanvas.width = rect.width || 400;
+      rpgCanvas.height = rect.height || 320;
+    }
+    resizeRpgCanvas();
+    window.addEventListener('resize', resizeRpgCanvas);
+
+    const stats = [
+      { label: 'STR', color: '#ff4d4d' },
+      { label: 'WIS', color: '#7b61ff' },
+      { label: 'CHA', color: '#00d4ff' },
+      { label: 'STA', color: '#00ff88' },
+      { label: 'AGI', color: '#ffaa00' },
+      { label: 'INT', color: '#ff61d4' },
+    ];
+
+    function drawRpg() {
+      const w = rpgCanvas.width;
+      const h = rpgCanvas.height;
+      const t = Date.now() * 0.001;
+
+      rctx.clearRect(0, 0, w, h);
+
+      const barWidth = w * 0.5;
+      const barHeight = 8;
+      const startX = (w - barWidth) / 2;
+      const startY = h * 0.2;
+      const gap = 28;
+
+      // Draw stat bars
+      stats.forEach((stat, i) => {
+        const y = startY + i * gap;
+        const fillPercent = 0.4 + Math.sin(t * 0.8 + i * 1.1) * 0.3;
+
+        // Label
+        rctx.font = '10px "Space Mono", monospace';
+        rctx.fillStyle = 'rgba(232, 232, 239, 0.5)';
+        rctx.textAlign = 'right';
+        rctx.fillText(stat.label, startX - 10, y + 7);
+
+        // Background bar
+        rctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        rctx.fillRect(startX, y, barWidth, barHeight);
+
+        // Filled bar
+        rctx.fillStyle = stat.color;
+        rctx.globalAlpha = 0.6 + Math.sin(t * 2 + i) * 0.2;
+        rctx.fillRect(startX, y, barWidth * fillPercent, barHeight);
+        rctx.globalAlpha = 1;
+
+        // Glow on bar tip
+        const tipX = startX + barWidth * fillPercent;
+        const glow = rctx.createRadialGradient(tipX, y + barHeight / 2, 0, tipX, y + barHeight / 2, 15);
+        glow.addColorStop(0, stat.color.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        rctx.fillStyle = glow;
+        rctx.fillRect(tipX - 15, y - 10, 30, barHeight + 20);
+      });
+
+      // XP bar at bottom
+      const xpY = startY + stats.length * gap + 15;
+      const xpFill = (Math.sin(t * 0.3) + 1) / 2;
+      rctx.font = '10px "Space Mono", monospace';
+      rctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
+      rctx.textAlign = 'center';
+      rctx.fillText('LVL ' + Math.floor(5 + Math.sin(t * 0.1) * 2), w / 2, xpY - 5);
+
+      rctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      rctx.fillRect(startX, xpY, barWidth, 6);
+      rctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
+      rctx.fillRect(startX, xpY, barWidth * xpFill, 6);
+
+      requestAnimationFrame(drawRpg);
+    }
+    drawRpg();
+  }
+
+  // ─── Obsidian Canvas — Terminal/Chat ──────────────
+  const obsidianCanvas = document.getElementById('obsidian-canvas');
+  if (obsidianCanvas) {
+    const octx = obsidianCanvas.getContext('2d');
+
+    function resizeObsidianCanvas() {
+      const rect = obsidianCanvas.parentElement.getBoundingClientRect();
+      obsidianCanvas.width = rect.width || 400;
+      obsidianCanvas.height = rect.height || 320;
+    }
+    resizeObsidianCanvas();
+    window.addEventListener('resize', resizeObsidianCanvas);
+
+    const lines = [
+      { prefix: '>', text: 'Summarize my meeting notes', color: '#e8e8ef' },
+      { prefix: '', text: 'Reading vault/meetings/2026-02...', color: '#7b61ff' },
+      { prefix: '', text: 'Found 3 files. Summarizing...', color: '#7b61ff' },
+      { prefix: '>', text: 'Create action items from summary', color: '#e8e8ef' },
+      { prefix: '', text: 'Writing vault/tasks/actions.md', color: '#00d4ff' },
+      { prefix: '', text: 'Done. Created 5 action items.', color: '#00ff88' },
+    ];
+
+    function drawObsidian() {
+      const w = obsidianCanvas.width;
+      const h = obsidianCanvas.height;
+      const t = Date.now() * 0.001;
+
+      octx.clearRect(0, 0, w, h);
+
+      const lineHeight = 22;
+      const startX = w * 0.1;
+      const startY = h * 0.18;
+      const totalCycleTime = lines.length * 1.5 + 2;
+      const cycleT = t % totalCycleTime;
+
+      lines.forEach((line, i) => {
+        const lineAppearTime = i * 1.5;
+        if (cycleT < lineAppearTime) return;
+
+        const elapsed = cycleT - lineAppearTime;
+        const charsToShow = Math.min(Math.floor(elapsed * 20), (line.prefix + ' ' + line.text).length);
+        const fullText = (line.prefix ? line.prefix + ' ' : '') + line.text;
+        const displayText = fullText.substring(0, charsToShow);
+
+        const y = startY + i * lineHeight;
+        const alpha = Math.min(elapsed * 2, 0.8);
+
+        octx.font = '11px "Space Mono", monospace';
+        octx.fillStyle = line.color.replace(')', `, ${alpha})`).replace('#', '');
+
+        // Convert hex to rgba
+        const hex = line.color;
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        octx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        octx.textAlign = 'left';
+        octx.fillText(displayText, startX, y);
+
+        // Blinking cursor at end of current line
+        if (charsToShow < fullText.length && Math.sin(t * 6) > 0) {
+          const textWidth = octx.measureText(displayText).width;
+          octx.fillStyle = `rgba(0, 212, 255, ${alpha})`;
+          octx.fillRect(startX + textWidth + 2, y - 10, 7, 13);
+        }
+      });
+
+      requestAnimationFrame(drawObsidian);
+    }
+    drawObsidian();
+  }
+
+  // ─── Vantalyze Canvas — Opportunity Solution Tree ─
+  const vantalyzeCanvas = document.getElementById('vantalyze-canvas');
+  if (vantalyzeCanvas) {
+    const vtctx = vantalyzeCanvas.getContext('2d');
+
+    function resizeVantalyzeCanvas() {
+      const rect = vantalyzeCanvas.parentElement.getBoundingClientRect();
+      vantalyzeCanvas.width = rect.width || 400;
+      vantalyzeCanvas.height = rect.height || 320;
+    }
+    resizeVantalyzeCanvas();
+    window.addEventListener('resize', resizeVantalyzeCanvas);
+
+    function drawVantalyze() {
+      const w = vantalyzeCanvas.width;
+      const h = vantalyzeCanvas.height;
+      const t = Date.now() * 0.001;
+
+      vtctx.clearRect(0, 0, w, h);
+
+      // Tree structure: outcome -> opportunities -> solutions
+      const cx = w / 2;
+      const levels = [
+        [{ x: cx, y: h * 0.15, r: 12, color: '#00d4ff', label: 'Outcome' }],
+        [
+          { x: cx - 70, y: h * 0.42, r: 9, color: '#7b61ff', label: 'Opp 1' },
+          { x: cx + 70, y: h * 0.42, r: 9, color: '#7b61ff', label: 'Opp 2' },
+        ],
+        [
+          { x: cx - 105, y: h * 0.72, r: 7, color: '#00ff88', label: 'S1' },
+          { x: cx - 35, y: h * 0.72, r: 7, color: '#00ff88', label: 'S2' },
+          { x: cx + 35, y: h * 0.72, r: 7, color: '#00ff88', label: 'S3' },
+          { x: cx + 105, y: h * 0.72, r: 7, color: '#00ff88', label: 'S4' },
+        ],
+      ];
+
+      // Draw connections
+      vtctx.lineWidth = 1;
+      // Level 0 -> Level 1
+      levels[1].forEach((node) => {
+        const pulse = 0.15 + Math.sin(t * 2 + node.x * 0.01) * 0.1;
+        vtctx.beginPath();
+        vtctx.moveTo(levels[0][0].x, levels[0][0].y);
+        vtctx.lineTo(node.x, node.y);
+        vtctx.strokeStyle = `rgba(123, 97, 255, ${pulse})`;
+        vtctx.stroke();
+      });
+      // Level 1 -> Level 2
+      levels[2].forEach((node, i) => {
+        const parentIdx = i < 2 ? 0 : 1;
+        const pulse = 0.15 + Math.sin(t * 2 + i * 0.8) * 0.1;
+        vtctx.beginPath();
+        vtctx.moveTo(levels[1][parentIdx].x, levels[1][parentIdx].y);
+        vtctx.lineTo(node.x, node.y);
+        vtctx.strokeStyle = `rgba(0, 255, 136, ${pulse})`;
+        vtctx.stroke();
+      });
+
+      // Draw nodes
+      let nodeIdx = 0;
+      levels.forEach((level) => {
+        level.forEach((node) => {
+          const breathe = 1 + Math.sin(t * 1.5 + nodeIdx * 0.9) * 0.15;
+          const r = node.r * breathe;
+
+          // Glow
+          const glow = vtctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r * 3);
+          const hex = node.color;
+          const cr = parseInt(hex.slice(1, 3), 16);
+          const cg = parseInt(hex.slice(3, 5), 16);
+          const cb = parseInt(hex.slice(5, 7), 16);
+          glow.addColorStop(0, `rgba(${cr}, ${cg}, ${cb}, 0.25)`);
+          glow.addColorStop(1, `rgba(${cr}, ${cg}, ${cb}, 0)`);
+          vtctx.beginPath();
+          vtctx.arc(node.x, node.y, r * 3, 0, Math.PI * 2);
+          vtctx.fillStyle = glow;
+          vtctx.fill();
+
+          // Node circle
+          vtctx.beginPath();
+          vtctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+          vtctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, 0.6)`;
+          vtctx.shadowColor = node.color;
+          vtctx.shadowBlur = 10;
+          vtctx.fill();
+          vtctx.shadowBlur = 0;
+
+          nodeIdx++;
+        });
+      });
+
+      // Data packets flowing down branches
+      for (let i = 0; i < 4; i++) {
+        const parentIdx = i < 2 ? 0 : 1;
+        const packetT = ((t * 0.8 + i * 0.5) % 2) / 2;
+        if (packetT <= 1) {
+          const fromNode = levels[1][parentIdx];
+          const toNode = levels[2][i];
+          const px = fromNode.x + (toNode.x - fromNode.x) * packetT;
+          const py = fromNode.y + (toNode.y - fromNode.y) * packetT;
+          vtctx.beginPath();
+          vtctx.arc(px, py, 2.5, 0, Math.PI * 2);
+          vtctx.fillStyle = `rgba(0, 255, 136, ${0.6 + Math.sin(t * 3 + i) * 0.3})`;
+          vtctx.fill();
+        }
+      }
+
+      requestAnimationFrame(drawVantalyze);
+    }
+    drawVantalyze();
+  }
+
   // ─── Scroll Reveal ──────────────────────────────
   const revealElements = document.querySelectorAll('.reveal-up, .reveal-text, .section-label');
 

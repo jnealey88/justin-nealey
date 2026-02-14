@@ -608,6 +608,24 @@ a {
   height: 100%;
 }
 
+/* RPG Graphic */
+.rpg-graphic canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Obsidian Graphic */
+.obsidian-graphic canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Vantalyze Graphic */
+.vantalyze-graphic canvas {
+  width: 100%;
+  height: 100%;
+}
+
 .project-info {
   padding: 2.5rem;
   display: flex;
