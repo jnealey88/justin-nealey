@@ -169,57 +169,117 @@
   }
   animateHero();
 
-  // ─── Vibe Canvas — Generative Art ───────────────
-  const vibeCanvas = document.getElementById('vibe-canvas');
-  if (vibeCanvas) {
-    const vctx = vibeCanvas.getContext('2d');
+  // ─── Airo Canvas — Agent Network ────────────────
+  const airoCanvas = document.getElementById('airo-canvas');
+  if (airoCanvas) {
+    const actx = airoCanvas.getContext('2d');
 
-    function resizeVibeCanvas() {
-      const rect = vibeCanvas.parentElement.getBoundingClientRect();
-      vibeCanvas.width = rect.width || 400;
-      vibeCanvas.height = rect.height || 320;
+    function resizeAiroCanvas() {
+      const rect = airoCanvas.parentElement.getBoundingClientRect();
+      airoCanvas.width = rect.width || 400;
+      airoCanvas.height = rect.height || 320;
     }
-    resizeVibeCanvas();
-    window.addEventListener('resize', resizeVibeCanvas);
+    resizeAiroCanvas();
+    window.addEventListener('resize', resizeAiroCanvas);
 
-    function drawVibeArt() {
-      const w = vibeCanvas.width;
-      const h = vibeCanvas.height;
-      const t = Date.now() * 0.002;
+    // Agent nodes: central orchestrator + specialized agents
+    const agents = [
+      { label: 'AIRO', radius: 16, orbit: 0, speed: 0, angle: 0 },
+      { label: 'Design', radius: 8, orbit: 80, speed: 0.4, angle: 0 },
+      { label: 'Content', radius: 8, orbit: 80, speed: 0.4, angle: Math.PI * 0.667 },
+      { label: 'Build', radius: 8, orbit: 80, speed: 0.4, angle: Math.PI * 1.333 },
+      { label: 'SEO', radius: 6, orbit: 120, speed: -0.25, angle: Math.PI * 0.25 },
+      { label: 'Images', radius: 6, orbit: 120, speed: -0.25, angle: Math.PI * 0.75 },
+      { label: 'Theme', radius: 6, orbit: 120, speed: -0.25, angle: Math.PI * 1.25 },
+      { label: 'Copy', radius: 6, orbit: 120, speed: -0.25, angle: Math.PI * 1.75 },
+    ];
 
-      vctx.clearRect(0, 0, w, h);
+    function drawAiroNetwork() {
+      const w = airoCanvas.width;
+      const h = airoCanvas.height;
+      const t = Date.now() * 0.001;
+      const cx = w / 2;
+      const cy = h / 2;
 
-      // Flowing wave lines
-      for (let i = 0; i < 8; i++) {
-        vctx.beginPath();
-        const yBase = (h / 9) * (i + 1);
-        for (let x = 0; x < w; x += 2) {
-          const y = yBase +
-            Math.sin(x * 0.01 + t + i * 0.5) * 20 +
-            Math.sin(x * 0.02 + t * 1.5) * 10;
-          if (x === 0) vctx.moveTo(x, y);
-          else vctx.lineTo(x, y);
+      actx.clearRect(0, 0, w, h);
+
+      // Compute positions
+      const positions = agents.map((agent) => {
+        if (agent.orbit === 0) return { x: cx, y: cy, ...agent };
+        const a = agent.angle + t * agent.speed;
+        return {
+          x: cx + Math.cos(a) * agent.orbit,
+          y: cy + Math.sin(a) * agent.orbit,
+          ...agent,
+        };
+      });
+
+      // Draw connections from center to all agents
+      positions.forEach((pos, i) => {
+        if (i === 0) return;
+        const pulse = 0.15 + Math.sin(t * 2 + i) * 0.1;
+        actx.beginPath();
+        actx.moveTo(positions[0].x, positions[0].y);
+        actx.lineTo(pos.x, pos.y);
+        actx.strokeStyle = `rgba(0, 212, 255, ${pulse})`;
+        actx.lineWidth = 1;
+        actx.stroke();
+
+        // Data packet traveling along the connection
+        const packetT = (Math.sin(t * 1.5 + i * 0.8) + 1) / 2;
+        const px = positions[0].x + (pos.x - positions[0].x) * packetT;
+        const py = positions[0].y + (pos.y - positions[0].y) * packetT;
+        actx.beginPath();
+        actx.arc(px, py, 2, 0, Math.PI * 2);
+        actx.fillStyle = `rgba(123, 97, 255, ${0.6 + Math.sin(t * 3 + i) * 0.3})`;
+        actx.fill();
+      });
+
+      // Draw orbit rings (faint)
+      [80, 120].forEach((r) => {
+        actx.beginPath();
+        actx.arc(cx, cy, r, 0, Math.PI * 2);
+        actx.strokeStyle = 'rgba(0, 212, 255, 0.06)';
+        actx.lineWidth = 1;
+        actx.stroke();
+      });
+
+      // Draw agent nodes
+      positions.forEach((pos, i) => {
+        // Glow
+        const glow = actx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, pos.radius * 3);
+        if (i === 0) {
+          glow.addColorStop(0, 'rgba(0, 212, 255, 0.3)');
+          glow.addColorStop(1, 'rgba(0, 212, 255, 0)');
+        } else {
+          glow.addColorStop(0, 'rgba(123, 97, 255, 0.2)');
+          glow.addColorStop(1, 'rgba(123, 97, 255, 0)');
         }
-        const hue = 180 + i * 20;
-        vctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${0.15 + i * 0.03})`;
-        vctx.lineWidth = 1.5;
-        vctx.stroke();
-      }
+        actx.beginPath();
+        actx.arc(pos.x, pos.y, pos.radius * 3, 0, Math.PI * 2);
+        actx.fillStyle = glow;
+        actx.fill();
 
-      // Floating dots
-      for (let i = 0; i < 20; i++) {
-        const x = (w / 2) + Math.cos(t * 0.5 + i * 1.2) * (w * 0.3);
-        const y = (h / 2) + Math.sin(t * 0.7 + i * 0.8) * (h * 0.3);
-        const r = 2 + Math.sin(t + i) * 1;
-        vctx.beginPath();
-        vctx.arc(x, y, r, 0, Math.PI * 2);
-        vctx.fillStyle = `rgba(0, 212, 255, ${0.3 + Math.sin(t + i) * 0.2})`;
-        vctx.fill();
-      }
+        // Node
+        actx.beginPath();
+        actx.arc(pos.x, pos.y, pos.radius, 0, Math.PI * 2);
+        if (i === 0) {
+          actx.fillStyle = 'rgba(0, 212, 255, 0.8)';
+          actx.shadowColor = '#00d4ff';
+          actx.shadowBlur = 20;
+        } else {
+          const brightness = 0.4 + Math.sin(t * 2 + i * 0.7) * 0.2;
+          actx.fillStyle = `rgba(123, 97, 255, ${brightness})`;
+          actx.shadowColor = '#7b61ff';
+          actx.shadowBlur = 10;
+        }
+        actx.fill();
+        actx.shadowBlur = 0;
+      });
 
-      requestAnimationFrame(drawVibeArt);
+      requestAnimationFrame(drawAiroNetwork);
     }
-    drawVibeArt();
+    drawAiroNetwork();
   }
 
   // ─── Scroll Reveal ──────────────────────────────
