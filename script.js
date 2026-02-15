@@ -282,6 +282,140 @@
     drawAiroNetwork();
   }
 
+  // ─── MRR Canvas — Market Research Report ──────────
+  const mrrCanvas = document.getElementById('mrr-canvas');
+  if (mrrCanvas) {
+    const mctx = mrrCanvas.getContext('2d');
+
+    function resizeMrrCanvas() {
+      const rect = mrrCanvas.parentElement.getBoundingClientRect();
+      mrrCanvas.width = rect.width || 400;
+      mrrCanvas.height = rect.height || 320;
+    }
+    resizeMrrCanvas();
+    window.addEventListener('resize', resizeMrrCanvas);
+
+    function drawMrr() {
+      const w = mrrCanvas.width;
+      const h = mrrCanvas.height;
+      const t = Date.now() * 0.001;
+
+      mctx.clearRect(0, 0, w, h);
+
+      // Document lines (simulating a research report)
+      const lineCount = 8;
+      const lineStartX = w * 0.15;
+      const lineEndX = w * 0.85;
+      const lineStartY = h * 0.12;
+      const lineSpacing = h * 0.065;
+
+      for (let i = 0; i < lineCount; i++) {
+        const y = lineStartY + i * lineSpacing;
+        const progress = Math.min(1, Math.max(0, (Math.sin(t * 0.8 - i * 0.3) + 1) / 2));
+        const endX = lineStartX + (lineEndX - lineStartX) * (0.5 + progress * 0.5);
+        const alpha = 0.15 + progress * 0.2;
+
+        mctx.beginPath();
+        mctx.moveTo(lineStartX, y);
+        mctx.lineTo(endX, y);
+        mctx.strokeStyle = `rgba(0, 212, 255, ${alpha})`;
+        mctx.lineWidth = 2;
+        mctx.stroke();
+      }
+
+      // Magnifying glass icon (scanning the report)
+      const glassX = w * 0.5 + Math.sin(t * 0.6) * w * 0.2;
+      const glassY = h * 0.35 + Math.cos(t * 0.4) * h * 0.1;
+      const glassR = 18;
+
+      // Glass glow
+      const glow = mctx.createRadialGradient(glassX, glassY, 0, glassX, glassY, glassR * 3);
+      glow.addColorStop(0, 'rgba(123, 97, 255, 0.2)');
+      glow.addColorStop(1, 'rgba(123, 97, 255, 0)');
+      mctx.beginPath();
+      mctx.arc(glassX, glassY, glassR * 3, 0, Math.PI * 2);
+      mctx.fillStyle = glow;
+      mctx.fill();
+
+      // Glass circle
+      mctx.beginPath();
+      mctx.arc(glassX, glassY, glassR, 0, Math.PI * 2);
+      mctx.strokeStyle = 'rgba(123, 97, 255, 0.6)';
+      mctx.lineWidth = 2;
+      mctx.stroke();
+
+      // Glass handle
+      const handleAngle = Math.PI * 0.25;
+      mctx.beginPath();
+      mctx.moveTo(glassX + Math.cos(handleAngle) * glassR, glassY + Math.sin(handleAngle) * glassR);
+      mctx.lineTo(glassX + Math.cos(handleAngle) * (glassR + 12), glassY + Math.sin(handleAngle) * (glassR + 12));
+      mctx.strokeStyle = 'rgba(123, 97, 255, 0.5)';
+      mctx.lineWidth = 3;
+      mctx.stroke();
+
+      // Insight nodes appearing below the report
+      const insights = [
+        { x: w * 0.25, y: h * 0.72, color: '#00d4ff', label: 'Industry' },
+        { x: w * 0.5, y: h * 0.72, color: '#7b61ff', label: 'Company' },
+        { x: w * 0.75, y: h * 0.72, color: '#00ff88', label: 'Insights' },
+      ];
+
+      insights.forEach((node, i) => {
+        const breathe = 1 + Math.sin(t * 1.5 + i * 1.2) * 0.15;
+        const r = 8 * breathe;
+        const hex = node.color;
+        const cr = parseInt(hex.slice(1, 3), 16);
+        const cg = parseInt(hex.slice(3, 5), 16);
+        const cb = parseInt(hex.slice(5, 7), 16);
+
+        // Connection line from report area to insight
+        const pulse = 0.1 + Math.sin(t * 2 + i) * 0.08;
+        mctx.beginPath();
+        mctx.moveTo(node.x, h * 0.55);
+        mctx.lineTo(node.x, node.y);
+        mctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, ${pulse})`;
+        mctx.lineWidth = 1;
+        mctx.stroke();
+
+        // Node glow
+        const nodeGlow = mctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r * 3);
+        nodeGlow.addColorStop(0, `rgba(${cr}, ${cg}, ${cb}, 0.25)`);
+        nodeGlow.addColorStop(1, `rgba(${cr}, ${cg}, ${cb}, 0)`);
+        mctx.beginPath();
+        mctx.arc(node.x, node.y, r * 3, 0, Math.PI * 2);
+        mctx.fillStyle = nodeGlow;
+        mctx.fill();
+
+        // Node circle
+        mctx.beginPath();
+        mctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+        mctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, 0.6)`;
+        mctx.shadowColor = node.color;
+        mctx.shadowBlur = 10;
+        mctx.fill();
+        mctx.shadowBlur = 0;
+      });
+
+      // Data particles flowing from glass to insights
+      for (let i = 0; i < 3; i++) {
+        const packetT = ((t * 0.7 + i * 0.7) % 2) / 2;
+        if (packetT <= 1) {
+          const fromY = glassY + glassR;
+          const toNode = insights[i];
+          const px = glassX + (toNode.x - glassX) * packetT;
+          const py = fromY + (toNode.y - fromY) * packetT;
+          mctx.beginPath();
+          mctx.arc(px, py, 2, 0, Math.PI * 2);
+          mctx.fillStyle = `rgba(0, 212, 255, ${0.5 + Math.sin(t * 3 + i) * 0.3})`;
+          mctx.fill();
+        }
+      }
+
+      requestAnimationFrame(drawMrr);
+    }
+    drawMrr();
+  }
+
   // ─── RPG Canvas — Stat Bars & XP ─────────────────
   const rpgCanvas = document.getElementById('rpg-canvas');
   if (rpgCanvas) {
