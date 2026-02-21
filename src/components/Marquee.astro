@@ -1,0 +1,26 @@
+---
+const items = [
+  'PRODUCT STRATEGY',
+  'AI AGENTS',
+  'WORDPRESS',
+  'DESIGN SYSTEMS',
+  'WEB DEVELOPMENT',
+  'USER EXPERIENCE',
+];
+---
+
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-content">
+      {
+        /* Duplicate items for seamless loop */
+        [...items, ...items].map((item, i) => (
+          <>
+            <span>{item}</span>
+            <span class="marquee-dot" />
+          </>
+        ))
+      }
+    </div>
+  </div>
+</div>

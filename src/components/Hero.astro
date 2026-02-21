@@ -1,0 +1,219 @@
+---
+---
+
+<section class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="tag-line"></span>
+      <span class="tag-text" data-text="PRODUCT &times; CODE"
+        >PRODUCT &times; CODE</span
+      >
+    </div>
+    <h1 class="hero-name">
+      <span class="name-line">
+        <span class="name-word" data-letter-animation>Justin</span>
+      </span>
+      <span class="name-line">
+        <span class="name-word" data-letter-animation>Nealey</span>
+        <span class="name-accent">.</span>
+      </span>
+    </h1>
+    <p class="hero-subtitle">
+      <span class="subtitle-reveal"
+        >Principal Product Manager at <strong>GoDaddy</strong> - Vibe Coder</span
+      >
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary">
+        <span class="btn-text">View Work</span>
+        <span class="btn-arrow">&rarr;</span>
+      </a>
+      <div class="scroll-indicator">
+        <div class="scroll-line"></div>
+        <span class="scroll-text">Scroll</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-grid-overlay"></div>
+</section>
+
+<script>
+  // Hero Canvas — Particle Constellation
+  const heroCanvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+  const ctx = heroCanvas.getContext('2d')!;
+  let particles: Particle[] = [];
+  const PARTICLE_COUNT = 80;
+  const CONNECTION_DIST = 150;
+  let mouseX = 0;
+  let mouseY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  function resizeCanvas() {
+    heroCanvas.width = window.innerWidth;
+    heroCanvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  class Particle {
+    x: number = 0;
+    y: number = 0;
+    vx: number = 0;
+    vy: number = 0;
+    radius: number = 0;
+    opacity: number = 0;
+
+    constructor() {
+      this.reset();
+    }
+
+    reset() {
+      this.x = Math.random() * heroCanvas.width;
+      this.y = Math.random() * heroCanvas.height;
+      this.vx = (Math.random() - 0.5) * 0.5;
+      this.vy = (Math.random() - 0.5) * 0.5;
+      this.radius = Math.random() * 2 + 0.5;
+      this.opacity = Math.random() * 0.5 + 0.1;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      const dx = this.x - mouseX;
+      const dy = this.y - (mouseY + window.scrollY);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        const force = (120 - dist) / 120;
+        this.vx += (dx / dist) * force * 0.3;
+        this.vy += (dy / dist) * force * 0.3;
+      }
+
+      this.vx *= 0.99;
+      this.vy *= 0.99;
+
+      if (this.x < 0 || this.x > heroCanvas.width) this.vx *= -1;
+      if (this.y < 0 || this.y > heroCanvas.height) this.vy *= -1;
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 212, 255, ${this.opacity})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push(new Particle());
+  }
+
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < CONNECTION_DIST) {
+          const opacity = (1 - dist / CONNECTION_DIST) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0, 212, 255, ${opacity})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function animateHero() {
+    ctx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+
+    const time = Date.now() * 0.001;
+
+    const gradient1 = ctx.createRadialGradient(
+      heroCanvas.width * 0.3 + Math.sin(time * 0.3) * 100,
+      heroCanvas.height * 0.4 + Math.cos(time * 0.2) * 80,
+      0,
+      heroCanvas.width * 0.3,
+      heroCanvas.height * 0.4,
+      400,
+    );
+    gradient1.addColorStop(0, 'rgba(0, 212, 255, 0.06)');
+    gradient1.addColorStop(1, 'rgba(0, 212, 255, 0)');
+    ctx.fillStyle = gradient1;
+    ctx.fillRect(0, 0, heroCanvas.width, heroCanvas.height);
+
+    const gradient2 = ctx.createRadialGradient(
+      heroCanvas.width * 0.7 + Math.cos(time * 0.4) * 120,
+      heroCanvas.height * 0.6 + Math.sin(time * 0.3) * 60,
+      0,
+      heroCanvas.width * 0.7,
+      heroCanvas.height * 0.6,
+      350,
+    );
+    gradient2.addColorStop(0, 'rgba(123, 97, 255, 0.05)');
+    gradient2.addColorStop(1, 'rgba(123, 97, 255, 0)');
+    ctx.fillStyle = gradient2;
+    ctx.fillRect(0, 0, heroCanvas.width, heroCanvas.height);
+
+    particles.forEach((p) => {
+      p.update();
+      p.draw();
+    });
+
+    drawConnections();
+    requestAnimationFrame(animateHero);
+  }
+  animateHero();
+
+  // Parallax on Hero
+  const heroContent = document.querySelector('.hero-content') as HTMLElement;
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (scrollY < window.innerHeight) {
+      heroContent.style.transform = `translateY(${scrollY * 0.3}px)`;
+      heroContent.style.opacity = String(
+        1 - scrollY / (window.innerHeight * 0.8),
+      );
+    }
+  });
+
+  // Letter animation on name hover — uses safe DOM methods (no innerHTML)
+  const nameWords = document.querySelectorAll('[data-letter-animation]');
+  nameWords.forEach((word) => {
+    const text = word.textContent || '';
+    // Clear children safely using DOM methods
+    while (word.firstChild) {
+      word.removeChild(word.firstChild);
+    }
+    text.split('').forEach((char, i) => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      span.style.display = 'inline-block';
+      span.style.transition = `transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.02}s, color 0.3s`;
+      word.appendChild(span);
+    });
+
+    word.addEventListener('mouseenter', () => {
+      word.querySelectorAll('span').forEach((span, i) => {
+        (span as HTMLElement).style.transform = `translateY(${Math.sin(i * 0.8) * -8}px)`;
+        (span as HTMLElement).style.color = '#00d4ff';
+      });
+    });
+
+    word.addEventListener('mouseleave', () => {
+      word.querySelectorAll('span').forEach((span) => {
+        (span as HTMLElement).style.transform = 'translateY(0)';
+        (span as HTMLElement).style.color = '';
+      });
+    });
+  });
+</script>

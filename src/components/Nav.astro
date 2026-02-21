@@ -1,0 +1,57 @@
+---
+---
+
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">JN<span class="accent">.</span></a>
+  <div class="nav-links">
+    <a href="#about" class="nav-link" data-text="About">About</a>
+    <a href="#projects" class="nav-link" data-text="Projects">Projects</a>
+    <a href="#contact" class="nav-link" data-text="Contact">Contact</a>
+  </div>
+</nav>
+
+<script>
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(
+        (anchor as HTMLAnchorElement).getAttribute('href')!,
+      );
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Nav background on scroll
+  const nav = document.getElementById('nav')!;
+  let lastScroll = 0;
+
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.scrollY;
+
+    if (currentScroll > 100) {
+      nav.style.mixBlendMode = 'normal';
+      nav.style.background = 'rgba(10, 10, 15, 0.8)';
+      nav.style.backdropFilter = 'blur(20px)';
+      nav.style.webkitBackdropFilter = 'blur(20px)';
+    } else {
+      nav.style.mixBlendMode = 'difference';
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'none';
+      nav.style.webkitBackdropFilter = 'none';
+    }
+
+    // Hide/show nav on scroll direction
+    if (currentScroll > lastScroll && currentScroll > 300) {
+      nav.style.transform = 'translateY(-100%)';
+    } else {
+      nav.style.transform = 'translateY(0)';
+    }
+    nav.style.transition =
+      'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s';
+
+    lastScroll = currentScroll;
+  });
+</script>

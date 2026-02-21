@@ -1,0 +1,85 @@
+---
+---
+
+<section class="about" id="about">
+  <div class="section-container">
+    <div class="section-label">
+      <span class="label-number">01</span>
+      <span class="label-line"></span>
+      <span class="label-text">About</span>
+    </div>
+    <div class="about-grid">
+      <div class="about-headline">
+        <h2 class="reveal-text">
+          <span class="reveal-line">I build products</span>
+          <span class="reveal-line">people actually</span>
+          <span class="reveal-line"><em>want</em> to use.</span>
+        </h2>
+      </div>
+      <div class="about-body">
+        <div class="about-description reveal-up">
+          <p>
+            Product leader and builder. I sit at the intersection of strategy,
+            design, and engineering — turning ideas into real products that ship.
+          </p>
+          <p>
+            At GoDaddy, I lead Airo for WordPress — an AI multi-agent builder
+            that helps entrepreneurs create their online presence. Outside of
+            that, I build tools and experiments that push what's possible on the
+            web.
+          </p>
+        </div>
+        <div class="about-stats">
+          <div class="stat reveal-up" style="--delay: 0.1s">
+            <span class="stat-value" data-count="10">0</span><span
+              class="stat-suffix">+</span
+            >
+            <span class="stat-label">Years in Product</span>
+          </div>
+          <div class="stat reveal-up" style="--delay: 0.2s">
+            <span
+              class="stat-label"
+              style="font-size: 1.5rem; font-weight: 600; color: var(--accent);"
+              >GoDaddy</span
+            >
+            <span class="stat-label">Principal PM</span>
+          </div>
+          <div class="stat reveal-up" style="--delay: 0.3s">
+            <span class="stat-value">&infin;</span>
+            <span class="stat-label">Side Projects</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Counting animation
+  const statValues = document.querySelectorAll('[data-count]');
+  const countObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target as HTMLElement;
+          const target = parseInt(el.dataset.count!, 10);
+          let current = 0;
+          const increment = target / 40;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              el.textContent = String(target);
+              clearInterval(timer);
+            } else {
+              el.textContent = String(Math.floor(current));
+            }
+          }, 30);
+          countObserver.unobserve(el);
+        }
+      });
+    },
+    { threshold: 0.5 },
+  );
+
+  statValues.forEach((el) => countObserver.observe(el));
+</script>

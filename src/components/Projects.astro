@@ -1,0 +1,25 @@
+---
+import { projects } from '../data/projects';
+import ProjectCard from './ProjectCard.astro';
+---
+
+<section class="projects" id="projects">
+  <div class="section-container">
+    <div class="section-label">
+      <span class="label-number">02</span>
+      <span class="label-line"></span>
+      <span class="label-text">Projects</span>
+    </div>
+    <div class="projects-header">
+      <h2 class="reveal-text">
+        <span class="reveal-line">Products &</span>
+        <span class="reveal-line"
+          >Side Projects<span class="accent">.</span></span
+        >
+      </h2>
+    </div>
+    <div class="projects-list">
+      {projects.map((project, i) => <ProjectCard project={project} index={i} />)}
+    </div>
+  </div>
+</section>

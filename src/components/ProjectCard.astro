@@ -1,0 +1,87 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+  index: number;
+}
+
+const { project, index } = Astro.props;
+const delay = `${+((index + 1) * 0.1).toFixed(1)}s`;
+---
+
+{project.cardLink ? (
+  <a href={project.cardLink} target="_blank" rel="noopener noreferrer" class="project-card-link">
+    <article class="project-card reveal-up" style={`--delay: ${delay}`}>
+      <div class="project-card-inner">
+        <div class="project-visual">
+          <div class={`project-graphic ${project.graphicClass}`}>
+            {project.useDsgGrid ? (
+              <div class="dsg-grid">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <div class="dsg-block" style={`--i:${i}`} />
+                ))}
+              </div>
+            ) : project.canvasId ? (
+              <canvas id={project.canvasId} />
+            ) : null}
+            <span class="project-graphic-label" set:html={project.graphicLabel} />
+          </div>
+        </div>
+        <div class="project-info">
+          <div class="project-meta">
+            {project.tags.map((tag) => (
+              <span class="project-tag">{tag}</span>
+            ))}
+          </div>
+          <h3 class="project-title">{project.title}</h3>
+          <p class="project-desc">{project.description}</p>
+          <div class="project-tech">
+            {project.tech.map((t) => (
+              <span>{t}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </article>
+  </a>
+) : (
+  <article class="project-card reveal-up" style={`--delay: ${delay}`}>
+    <div class="project-card-inner">
+      <div class="project-visual">
+        <div class={`project-graphic ${project.graphicClass}`}>
+          {project.useDsgGrid ? (
+            <div class="dsg-grid">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div class="dsg-block" style={`--i:${i}`} />
+              ))}
+            </div>
+          ) : project.canvasId ? (
+            <canvas id={project.canvasId} />
+          ) : null}
+          <span class="project-graphic-label" set:html={project.graphicLabel} />
+        </div>
+      </div>
+      <div class="project-info">
+        <div class="project-meta">
+          {project.tags.map((tag) => (
+            <span class="project-tag">{tag}</span>
+          ))}
+        </div>
+        <h3 class="project-title">
+          {project.titleLink ? (
+            <a href={project.titleLink} target="_blank" rel="noopener">{project.title}</a>
+          ) : (
+            project.title
+          )}
+        </h3>
+        <p class="project-desc">{project.description}</p>
+        <div class="project-tech">
+          {project.tech.map((t) => (
+            <span>{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </article>
+)}

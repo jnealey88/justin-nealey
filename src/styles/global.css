@@ -540,6 +540,12 @@ a {
 }
 
 /* Project Card */
+.project-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .project-card {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
@@ -626,6 +632,12 @@ a {
   height: 100%;
 }
 
+/* First Draft Feed Graphic */
+.fdf-graphic canvas {
+  width: 100%;
+  height: 100%;
+}
+
 /* Vantalyze Graphic */
 .vantalyze-graphic canvas {
   width: 100%;
@@ -663,6 +675,16 @@ a {
   margin-bottom: 0.75rem;
 }
 
+.project-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.project-title a:hover {
+  color: var(--accent);
+}
+
 .project-desc {
   font-size: 0.95rem;
   line-height: 1.6;
@@ -696,7 +718,7 @@ a {
   padding: 4rem 0;
 }
 
-.contact-headline h2 {
+h2.contact-headline {
   font-size: clamp(3rem, 7vw, 6rem);
   font-weight: 700;
   line-height: 1;
