@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jnealey88/justin-nealey.git"
+    "url": "git+https://github.com/jnealey-godaddy/justin-nealey.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jnealey88/justin-nealey/issues"
+    "url": "https://github.com/jnealey-godaddy/justin-nealey/issues"
   },
-  "homepage": "https://github.com/jnealey88/justin-nealey#readme",
+  "homepage": "https://github.com/jnealey-godaddy/justin-nealey#readme",
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
     "astro": "^5.17.3"

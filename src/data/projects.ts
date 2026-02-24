@@ -23,7 +23,7 @@ export const projects: Project[] = [
     tech: ['PHP', 'WordPress', 'JavaScript', 'CSS'],
     graphicClass: 'designsetgo-graphic',
     graphicLabel: 'DSG',
-    titleLink: 'https://github.com/jnealey88/designsetgo/',
+    titleLink: 'https://github.com/jnealey-godaddy/designsetgo/',
     useDsgGrid: true,
   },
   {
@@ -56,7 +56,7 @@ export const projects: Project[] = [
     graphicClass: 'rpg-graphic',
     graphicLabel: 'RPG',
     canvasId: 'rpg-canvas',
-    cardLink: 'https://github.com/jnealey88/site-rpg-block',
+    cardLink: 'https://github.com/jnealey-godaddy/site-rpg-block',
   },
   {
     title: 'Obsidian Claude Code',
@@ -67,7 +67,7 @@ export const projects: Project[] = [
     graphicClass: 'obsidian-graphic',
     graphicLabel: '>_',
     canvasId: 'obsidian-canvas',
-    cardLink: 'https://github.com/jnealey88/obsidian-claude-code',
+    cardLink: 'https://github.com/jnealey-godaddy/obsidian-claude-code',
   },
   {
     title: 'First Draft Feed',
@@ -78,7 +78,7 @@ export const projects: Project[] = [
     graphicClass: 'fdf-graphic',
     graphicLabel: 'FDF',
     canvasId: 'fdf-canvas',
-    titleLink: 'https://github.com/jnealey88/first-draft-feed',
+    titleLink: 'https://github.com/jnealey-godaddy/first-draft-feed',
   },
   {
     title: 'Vantalyze',
